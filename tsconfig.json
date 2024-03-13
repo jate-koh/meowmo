@@ -1,0 +1,30 @@
+{
+    "include": ["./src/**/*"],
+    "compilerOptions": {
+      /* Basic Options */
+      "target": "ES2020",
+      "useDefineForClassFields": true,
+      "lib": ["ES2020", "DOM", "DOM.Iterable"],
+      "module": "ESNext",
+      "skipLibCheck": true,
+
+      /* Path mapping */
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["./src/*"]
+      },
+
+      /* Bundler mode */
+      "moduleResolution": "bundler",
+      "noEmit": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+
+      /* Linting */
+      "strict": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noFallthroughCasesInSwitch": true,
+    },
+    "exclude": ["node_modules", "dist"],
+  }

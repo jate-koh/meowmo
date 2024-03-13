@@ -1,0 +1,12 @@
+# Config files
+rollup.config.mjs
+prettier.config.cjs
+.eslintrc.cjs
+.editorconfig
+
+# Env
+.env
+
+# Folders
+dist/
+node_modules/
