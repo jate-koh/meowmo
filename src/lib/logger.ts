@@ -58,7 +58,10 @@ const formatMessage = (level: number, colorize: boolean = true) => {
   }
 };
 
-const LogPath = path.join(__dirname, '../logs');
+const LogPath =
+  process.env.NODE_ENV === 'development'
+    ? path.join(__dirname, '../../logs')
+    : path.join(__dirname, '../logs');
 
 export const Logger = winston.createLogger({
   level: 'silly',

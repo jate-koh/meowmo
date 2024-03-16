@@ -15,10 +15,13 @@ export class MeowmoLogger {
   }
 
   public setup(keepLogs?: boolean, logsPath?: string) {
+    let path = logsPath?.trim();
+    if (path === '') path = undefined;
+
     if (keepLogs) {
-      addLogFileTransport(MeowmoLogLevels.error, 'error.log', logsPath);
-      addLogFileTransport(MeowmoLogLevels.info, 'combined.log', logsPath);
-      addLogFileTransport(MeowmoLogLevels.warn, 'combined.log', logsPath);
+      addLogFileTransport(MeowmoLogLevels.error, 'error.log', path);
+      addLogFileTransport(MeowmoLogLevels.info, 'combined.log', path);
+      addLogFileTransport(MeowmoLogLevels.warn, 'combined.log', path);
     }
   }
 
