@@ -1,3 +1,5 @@
+// Credits: @riflowth, @vectier, @codern-org
+// For recommending the following extensions and settings. Making coding easier and more efficient.
 {
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
