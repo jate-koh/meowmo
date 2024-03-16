@@ -1,7 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs';
 import eslint from '@rollup/plugin-eslint';
 import json from '@rollup/plugin-json';
-import nodeResolve from '@rollup/plugin-node-resolve';
 import run from '@rollup/plugin-run';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
@@ -11,11 +10,12 @@ import nodeExternals from 'rollup-plugin-node-externals';
 import tsconfigPaths from 'rollup-plugin-tsconfig-paths';
 
 const dev = process.env.ROLLUP_WATCH === 'true';
+const enableTerser = false;
 
 export default {
   input: ['src/index.ts'],
   externals: [
-    nodeExternals()
+    nodeExternals(),
   ],
   resolve: {
     plugins: [tsconfigPaths(
@@ -25,14 +25,6 @@ export default {
     )]
   },
 	plugins: [
-    commonjs(),
-    // Copy files from src to dist
-    copy({
-      // Ex:
-      // targets: [
-      //   { src: 'src/config', dest: 'dist' },
-      // ],
-    }),
     // Transpile TypeScript to JavaScript
     typescript(
       {
@@ -42,10 +34,12 @@ export default {
         inlineSources: true,
       }
     ),
-    // Resolve node_modules
-    nodeResolve({
-      extensions: ['.ts', '.js'],
-      preferBuiltins: true,
+    // Copy files from src to dist
+    copy({
+      // Ex:
+      // targets: [
+        //   { src: 'src/config', dest: 'dist' },
+        // ],
     }),
     // Lint TypeScript files
     eslint({
@@ -56,17 +50,24 @@ export default {
       exclude: ['node_modules/**', 'dist/**'],
     }),
     // Terser
-    terser(),
+    enableTerser &&
+      terser({
+        format: {
+          comments: false,
+        },
+      }),
     // Parse JSON files
     json(),
     // Load environment variables
     dotenv(),
+    // Convert CommonJS modules to ES6
+    commonjs(),
     // Run the application in watch mode if run with the watch flag
     dev && run(
       {
         execArgv: ['-r', 'source-map-support/register'],
       }
-    )
+      ),
   ],
   output: [
     {
