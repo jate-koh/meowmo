@@ -1,12 +1,5 @@
-import Logger, { LogLevel, WinstonLogger, setLogFormat } from '@/lib/logger';
-
-export enum MeowmoLogLevels {
-  error = 'error',
-  warn = 'warn',
-  info = 'info',
-  debug = 'debug',
-  silly = 'silly',
-}
+import Logger, { LogLevel, WinstonLogger, addLogFileTransport, setLogFormat } from '@/lib/logger';
+import { MeowmoLogLevels } from '@/lib/types';
 
 export class MeowmoLogger {
   private static instance: MeowmoLogger;
@@ -19,6 +12,14 @@ export class MeowmoLogger {
       MeowmoLogger.instance = new MeowmoLogger();
     }
     return MeowmoLogger.instance;
+  }
+
+  public setup(keepLogs?: boolean, logsPath?: string) {
+    if (keepLogs) {
+      addLogFileTransport(MeowmoLogLevels.error, 'error.log', logsPath);
+      addLogFileTransport(MeowmoLogLevels.info, 'combined.log', logsPath);
+      addLogFileTransport(MeowmoLogLevels.warn, 'combined.log', logsPath);
+    }
   }
 
   public info(message: string, ...args: unknown[]) {

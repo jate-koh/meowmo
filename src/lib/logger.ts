@@ -1,7 +1,7 @@
 import path from 'path';
 import * as winston from 'winston';
 
-export const LogLevelsMap = {
+const LogLevelsMap = {
   error: 0,
   warn: 1,
   info: 2,
@@ -58,41 +58,12 @@ const formatMessage = (level: number, colorize: boolean = true) => {
   }
 };
 
-export const LogPath = path.join(__dirname, '../log');
+const LogPath = path.join(__dirname, '../logs');
 
 export const Logger = winston.createLogger({
   level: 'silly',
   levels: LogLevelsMap,
-  transports: [
-    new winston.transports.Console({}),
-    new winston.transports.File({
-      filename: 'error.log',
-      level: 'error',
-      dirname: LogPath,
-      format: winston.format.combine(
-        winston.format.align(),
-        formatMessage(LogLevelsMap.error, false),
-      ),
-    }),
-    new winston.transports.File({
-      level: 'info',
-      filename: 'combined.log',
-      dirname: LogPath,
-      format: winston.format.combine(
-        winston.format.align(),
-        formatMessage(LogLevelsMap.info, false),
-      ),
-    }),
-    new winston.transports.File({
-      level: 'warn',
-      filename: 'combined.log',
-      dirname: LogPath,
-      format: winston.format.combine(
-        winston.format.align(),
-        formatMessage(LogLevelsMap.warn, false),
-      ),
-    }),
-  ],
+  transports: [new winston.transports.Console({})],
 });
 
 export const setLogFormat = (level: LogLevel) => {
@@ -104,6 +75,47 @@ export const setLogFormat = (level: LogLevel) => {
       );
     }
   });
+};
+
+const DefaultFileTransportFormat: { [key in LogLevel]: winston.Logform.Format } = {
+  info: winston.format.combine(winston.format.align(), formatMessage(LogLevelsMap.info, false)),
+  warn: winston.format.combine(winston.format.align(), formatMessage(LogLevelsMap.warn, false)),
+  error: winston.format.combine(winston.format.align(), formatMessage(LogLevelsMap.error, false)),
+  debug: winston.format.combine(winston.format.align(), formatMessage(LogLevelsMap.debug, false)),
+  silly: winston.format.combine(winston.format.align(), formatMessage(LogLevelsMap.silly, false)),
+};
+
+export const addLogFileTransport = (
+  level: LogLevel,
+  filename: string,
+  dirname: string = LogPath,
+  format: winston.Logform.Format = DefaultFileTransportFormat[level],
+) => {
+  Logger.add(
+    new winston.transports.File({
+      level: level,
+      filename: filename,
+      dirname: dirname,
+      format: format,
+    }),
+  );
+};
+
+export const removeLogFileTransport = (filename?: string) => {
+  if (filename) {
+    Logger.transports = Logger.transports.filter((transport) => {
+      if (transport instanceof winston.transports.File) {
+        return transport.filename !== filename;
+      }
+      return true;
+    });
+  } else {
+    Logger.transports.forEach((transport) => {
+      if (transport instanceof winston.transports.File) {
+        transport.destroy();
+      }
+    });
+  }
 };
 
 export type WinstonLogger = typeof Logger;

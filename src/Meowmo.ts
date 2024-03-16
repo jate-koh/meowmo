@@ -1,23 +1,42 @@
 import MeowmoLogger from '@/Logger';
 import Loader from '@/events/Loader';
 import { IntentOptions } from '@/lib/constants';
-import { MeowmoConfig } from '@/lib/types';
+import { MeowmoConfig, MeowmoOptions } from '@/lib/types';
 import { Client } from 'discord.js';
 
 export class Meowmo {
   private config: MeowmoConfig;
   private logger: MeowmoLogger;
+  private options: MeowmoOptions = {};
 
   private loader: Loader = {} as Loader;
   private bot: Client = {} as Client;
 
-  public constructor(token: string, guildId: string) {
+  public constructor(
+    token: string,
+    guildId: string,
+    options?:
+      | {
+          keepLogs?: boolean;
+          logsPath?: string;
+        }
+      | MeowmoOptions,
+  ) {
     this.logger = MeowmoLogger.getInstance();
     this.config = {
       token,
       guildId,
     };
-    this.logger.info('Meowmo config loaded');
+
+    if (options) {
+      this.options = options as MeowmoOptions;
+    }
+
+    this.logger.setup(this.options.keepLogs, this.options.logsPath);
+    if (!this.options.keepLogs) {
+      this.logger.warn('Logs are not being kept as files!');
+    }
+    this.logger.info('Meowmo initial setup completed');
   }
 
   public meow() {
@@ -59,13 +78,14 @@ export class Meowmo {
         this.logger.error('Meowmo panicked', new Error('Unknown error'));
       }
     }
-    this.logger.warn('Meowmo shutting down');
+    this.logger.warn('Meowmo shut down unexpectedly!');
     process.exit(1);
   }
 
   public stop() {
     this.logger.info('Meowmo stopping');
     this.bot.destroy();
+    this.logger.info('Meowmo stopped gracefully!');
     process.exit(0);
   }
 }

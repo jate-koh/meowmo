@@ -1,18 +1,18 @@
 import { WinstonLogger } from '@/lib/logger';
-import { ServerConfig } from '@/lib/types';
+import { LoaderConfig } from '@/lib/types';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { Client } from 'discord.js';
 
 export class Loader {
   private logger: WinstonLogger;
-  private config: ServerConfig;
+  private config: LoaderConfig;
 
   private rest: REST = {} as REST;
 
   public constructor(
     logger: WinstonLogger,
-    config?: ServerConfig,
+    config?: LoaderConfig,
     token?: string,
     serverId?: string,
   ) {

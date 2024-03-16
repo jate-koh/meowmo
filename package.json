@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "rollup --config --watch",
-    "dev:clean": "rimraf log && rollup --config --watch",
+    "dev:clean": "rimraf logs && rollup --config --watch",
     "test": "node dist/index.js"
   },
   "license": "MIT",

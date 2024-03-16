@@ -6,9 +6,11 @@ dotenv.config();
 
 const token = process.env.BOT_TOKEN;
 const guildId = process.env.SERVER_ID;
+const keepLogs = process.env.KEEP_LOGS_FILE === 'true';
+const logsPath = process.env.LOGS_DIR_PATH;
 
 if (token && guildId) {
-  const meowmo = new Meowmo(token, guildId);
+  const meowmo = new Meowmo(token, guildId, { keepLogs, logsPath });
   meowmo.start();
 
   process.on('unhandledRejection', (error) => {
