@@ -1,4 +1,4 @@
-import path from 'path';
+import { DefaultLogPath } from '@/lib/constants';
 import * as winston from 'winston';
 
 const LogLevelsMap = {
@@ -58,11 +58,6 @@ const formatMessage = (level: number, colorize: boolean = true) => {
   }
 };
 
-const LogPath =
-  process.env.NODE_ENV === 'development'
-    ? path.join(__dirname, '../../logs')
-    : path.join(__dirname, '../logs');
-
 export const Logger = winston.createLogger({
   level: 'silly',
   levels: LogLevelsMap,
@@ -91,7 +86,7 @@ const DefaultFileTransportFormat: { [key in LogLevel]: winston.Logform.Format } 
 export const addLogFileTransport = (
   level: LogLevel,
   filename: string,
-  dirname: string = LogPath,
+  dirname: string = DefaultLogPath,
   format: winston.Logform.Format = DefaultFileTransportFormat[level],
 ) => {
   Logger.add(

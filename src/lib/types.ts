@@ -19,7 +19,6 @@ export enum MeowmoLogLevels {
 }
 
 export type LoaderConfig = {
-  token: string;
   guildId: string;
   commands: RESTPostAPIApplicationCommandsJSONBody[];
 };

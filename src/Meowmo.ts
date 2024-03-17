@@ -1,73 +1,37 @@
-import MeowmoLogger from '@/Logger';
-import Loader from '@/events/Loader';
-import { IntentOptions } from '@/lib/constants';
-import { MeowmoConfig, MeowmoOptions } from '@/lib/types';
-import { Client } from 'discord.js';
+import MeowmoCore from '@/MeowmoCore';
+import Ping from '@/events/commands/common/Ping';
+import { ActivityType } from 'discord.js';
 
-export class Meowmo {
-  private config: MeowmoConfig;
-  private logger: MeowmoLogger;
-  private options: MeowmoOptions = {};
+export class Meowmo extends MeowmoCore {
+  public ready(): void | Error {
+    this.logger.info('Meowmo ready!');
 
-  private loader: Loader = {} as Loader;
-  private bot: Client = {} as Client;
-
-  public constructor(
-    token: string,
-    guildId: string,
-    options?:
-      | {
-          keepLogs?: boolean;
-          logsPath?: string;
-        }
-      | MeowmoOptions,
-  ) {
-    this.logger = MeowmoLogger.getInstance();
-    this.config = {
-      token,
-      guildId,
-    };
-
-    if (options) {
-      this.options = options as MeowmoOptions;
-    }
-
-    this.logger.setup(this.options.keepLogs, this.options.logsPath);
-    if (!this.options.keepLogs) {
-      this.logger.warn('Logs are not being kept as files!');
-    }
-    this.logger.info('Meowmo initial setup completed');
-  }
-
-  public meow() {
-    this.logger.silly('Meow!');
-  }
-
-  public async start(): Promise<void | Error> {
-    this.logger.info('Meowmo starting');
-
-    this.bot = new Client({ intents: IntentOptions });
-    await this.bot
-      .login(this.config.token)
-      .then(() => {
-        this.logger.info('Meowmo logged in');
-      })
-      .catch((error) => {
-        this.logger.error('Meowmo failed to log in', error);
-      });
-
-    this.loader = new Loader(this.logger.child({ module: 'Loader' }));
-    await this.loader
-      .start(this.bot)
-      .then(() => {
-        this.bot.once('ready', () => {
-          this.logger.info('Meowmo ready');
+    this.logger.info('Setting up presence');
+    setInterval(
+      () => {
+        this.bot.user?.setPresence({
+          activities: [
+            {
+              name: 'Meow!',
+              state: '🐱 Meow! Mouuu!',
+              type: ActivityType.Custom,
+            },
+          ],
         });
-      })
-      .catch((error) => {
-        this.logger.error('Loader failed to start', error);
-        Promise.reject(error);
-      });
+      },
+      1000 * 60 * 5,
+    );
+
+    this.logger.info('Meowmo registering commands');
+    try {
+      this.loader.register(this.bot, [
+        // Add your commands here
+        new Ping(),
+      ]);
+    } catch (error) {
+      this.logger.error('Error registering commands', error as Error);
+      this.logger.warn('No commands registered');
+    }
   }
 
   public panic(error?: Error) {
@@ -79,6 +43,7 @@ export class Meowmo {
       }
     }
     this.logger.warn('Meowmo shut down unexpectedly!');
+    this.bot.destroy();
     process.exit(1);
   }
 
